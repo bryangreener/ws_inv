@@ -190,8 +190,8 @@ end
 
 function Turtle:move_to(dest, axis)
     if utils.isempty(axis) then
-        self.move_to(dest, "x")
-        self.move_to(dest, "z")
+        self:move_to(dest, "x")
+        self:move_to(dest, "z")
     else
         c0 = self.curr_pos[axis]
         c1 = dest[axis]
@@ -273,8 +273,8 @@ function Turtle:calibrate()
     local d_x = new_pos.x - self.curr_pos.x
     local d_z = new_pos.z - self.curr_pos.z
     local v = (
-        (dx + math.abs(dx) * 2) +
-        (dz + math.abs(dz) * 3)
+        (d_x + math.abs(d_x) * 2) +
+        (d_z + math.abs(d_z) * 3)
     )
     self.orientation = Orientation{v=v}
 

@@ -38,9 +38,14 @@ local int_to_card = utils.invert_table(card_to_int)
 ---     local o0 = Orientation{card="n"}
 ---     local o1 = Orientation{rot="-x"}
 ---     local o2 = Orientation{v=1}
-local function Orientation.__init__(base, args)
+function Orientation.__init__(base, args)
+    local card
+
+    if args == nil then
+        args = {}
+    end
     -- Mandatory arguments
-    if args == nil or (args.card == nil and args.rot == nil and args.v == nil) then
+    if (args.card == nil and args.rot == nil and args.v == nil) then
         error("ValueError: Must supply one of [card, rot, v]")
     end
     if args.card ~= nil and type(args.card) ~= "string" then
@@ -52,8 +57,6 @@ local function Orientation.__init__(base, args)
     if args.v ~= nil and type(args.v) ~= "number" then
         error(("ValueError: v must be a number. Got %s"):format(type(args.v)))
     end
-
-    local card
 
     if args.card ~= nil then
         card = string.lower(args.card)
@@ -67,7 +70,9 @@ local function Orientation.__init__(base, args)
         error("ValueError: invalid inputs: " .. textutils.serialize(args))
     end
 
-    self = {cardinal=card}
+    self = {
+        cardinal=card,
+    }
     setmetatable(self, {__index=Orientation})
     return self
 end
@@ -121,11 +126,11 @@ function Orientation:axis_and_sign_to_cardinal(axis, sign)
     end
     axis = string.lower(axis)
 
-    if ~(axis == "x" or axis == "z") then
+    if not (axis == "x" or axis == "z") then
         error("ValueError: invalid axis: " .. axis)
     end
 
-    if ~(sign == "-" or sign == "+") then
+    if not (sign == "-" or sign == "+") then
         error("ValueError: invalid sign: " .. sign)
     end
     

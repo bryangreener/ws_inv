@@ -79,6 +79,8 @@ function Scanner.__init__(base, args)
     }
     setmetatable(self, {__index=Scanner})
 
+    self.turtle:calibrate()
+
     print("Scanner: Initialized.")
     return self
 end
