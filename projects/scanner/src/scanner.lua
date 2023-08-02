@@ -1,3 +1,4 @@
+local utils = require("utils")
 local inventory = require("inventory")
 local Turtle = require("turtle")
 
@@ -14,23 +15,23 @@ local dest_pos = nil
 local Scanner = {}
 
 local function default_on_move_cb(pos, orientation)
-    print("on_move_cb: " .. textutils.serialize(pos)
+    print("on_move_cb: " .. textutils.serialize(pos))
 end
 
 local function scan_snake(_turtle, start_pos, end_pos)
     print(("Scanning: mode=snake, start=%s, end=%s"):format(tostring(start_pos), tostring(end_pos)))
     local res = true
-    local dir_x = ((pos_1.x - pos_0.x) < 0) and -1 or 1
+    local dir_x = ((end_pos.x - start_pos.x) < 0) and -1 or 1
 
-    for x=math.abs(pos_0.x),math.abs(pos_1.x)+1 do
-        res = _turtle:move_to(vector.new(x, pos_0.y, _turtle:get_pos().z))
+    for x=math.abs(start_pos.x),math.abs(end_pos.x)+1 do
+        res = _turtle:move_to(vector.new(x, start_pos.y, _turtle:get_pos().z))
         if not res then break end
 
-        if (x - pos_0.x) % 2 == 0 then
-            res = _turtle:move_to(vector.new(x, pos_0.y, pos_1.z + 1))
+        if (x - start_pos.x) % 2 == 0 then
+            res = _turtle:move_to(vector.new(x, start_pos.y, end_pos.z + 1))
             if not res then break end
         else
-            _turtle:move_to(vector.new(x, pos_0.y, pos_0.z))
+            _turtle:move_to(vector.new(x, start_pos.y, start_pos.z))
             if not res then break end
         end
     end
@@ -51,6 +52,10 @@ function Scanner.__init__(base, args)
     local mode
 
     print("Scanner: Initializing...")
+
+    if args == nil then
+        args = {}
+    end
 
     -- If all three of x, y, and z are specified for home position, use them.
     -- Otherwise, we will just use the current position as the home position.
@@ -111,7 +116,7 @@ end
 
 local scanner = Scanner()
 
-local tmp = vector.new(-436, home_pos.y, 1737)
-scanner.scan("snake", tmp)
+local tmp = vector.new(-436, 60, 1737)
+scanner:scan("snake", tmp)
 
 return Scanner

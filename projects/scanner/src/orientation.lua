@@ -1,3 +1,5 @@
+local utils = require("utils")
+
 local Orientation = {}
 
 -- We will convert all orientations to cardinal throughout this program.
@@ -36,9 +38,9 @@ local int_to_card = utils.invert_table(card_to_int)
 ---     local o0 = Orientation{card="n"}
 ---     local o1 = Orientation{rot="-x"}
 ---     local o2 = Orientation{v=1}
-local Orientation.__init__(base, args)
+local function Orientation.__init__(base, args)
     -- Mandatory arguments
-    if args.card == nil and args.rot == nil and args.v == nil then
+    if args == nil or (args.card == nil and args.rot == nil and args.v == nil) then
         error("ValueError: Must supply one of [card, rot, v]")
     end
     if args.card ~= nil and type(args.card) ~= "string" then
