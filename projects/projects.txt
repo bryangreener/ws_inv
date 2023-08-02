@@ -1,0 +1,9 @@
+./projects/scanner/src/turtle.lua
+./projects/scanner/src/config.lua
+./projects/scanner/src/utils.lua
+./projects/scanner/src/message.lua
+./projects/scanner/src/slave.lua
+./projects/scanner/src/scanner.lua
+./projects/scanner/src/orientation.lua
+./projects/scanner/src/master.lua
+./projects/scanner/src/inventory.lua
