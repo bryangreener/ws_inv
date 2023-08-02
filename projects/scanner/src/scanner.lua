@@ -109,10 +109,9 @@ function Scanner:scan(mode, end_pos, start_pos)
     end
 end
 
-print(turtle.getFuelLevel())
-scan_init()
+local scanner = Scanner()
 
 local tmp = vector.new(-436, home_pos.y, 1737)
-scan_rect(home_pos, tmp)
+scanner.scan("snake", tmp)
 
-print("Found " .. inventory_count .. " inventories.")
+return Scanner
