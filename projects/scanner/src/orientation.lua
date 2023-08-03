@@ -74,13 +74,17 @@ function Orientation.__init__(base, args)
         cardinal=card,
     }
     setmetatable(self, {__index=Orientation})
+    setmetatable(
+        self,
+        {
+            __tostring=function()
+                return ("<Orientation: cardinal=%s>"):format(self.cardinal)
+            end
+        }
+    )
     return self
 end
 setmetatable(Orientation, {__call=Orientation.__init__})
-
-function Orientation:__tostring()
-    return ("<Orientation: cardinal=%s>"):format(self.cardinal)
-end
 
 -- We only want to use cardinal directions so this is the only variable we expose.
 function Orientation:get()
