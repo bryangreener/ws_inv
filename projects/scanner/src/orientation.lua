@@ -1,6 +1,6 @@
 local utils = require("utils")
 
-local Orientation = {cardinal=nil}
+local Orientation = {}
 
 -- This is what we return from this module for use with "require()".
 local orientation = {Orientation=Orientation}
@@ -43,36 +43,30 @@ local int_to_cardinal = utils.invert_table(cardinal_to_int)
 ---     local o0 = Orientation{cardinal="n"}
 ---     local o1 = Orientation{axis="-x"}
 ---     local o2 = Orientation{axis=1}
-function Orientation.__init__(o, args)
-    o = o or {}
-    setmetatable(o, self)
-    self.__index = self
-    self.__tostring = Orientation.__tostring
-
-    local cardinal
+function Orientation.__init__(base, args)
+    local self = {cardinal=nil}
+    setmetatable(self, {__index=Orientation, __tostring=Orientation.__tostring})
 
     assert(args ~= nil)
     assert(args.cardinal ~= nil or args.axis ~= nil)
 
     if args.cardinal ~= nil then
         assert(type(args.cardinal) == "string")
-        cardinal = string.lower(args.cardinal)
+        self.cardinal = string.lower(args.cardinal)
     end
 
     if args.axis ~= nil then
         assert(type(args.axis) == "string" or type(args.axis) == "number")
         if type(args.axis) == "string" then
-            cardinal = axis_to_cardinal[string.lower(args.axis)]
+            self.cardinal = axis_to_cardinal[string.lower(args.axis)]
         elseif type(args.axis) == "number" then
-            cardinal = int_to_cardinal[args.axis]
+            self.cardinal = int_to_cardinal[args.axis]
         end
     end
 
-    assert(not utils.isempty(cardinal))
+    assert(not utils.isempty(self.cardinal))
 
-    self.cardinal = cardinal
-
-    return o
+    return self
 end
 setmetatable(Orientation, {__call=Orientation.__init__})
 

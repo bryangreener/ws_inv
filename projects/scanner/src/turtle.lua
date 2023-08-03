@@ -1,12 +1,7 @@
 local utils = require("utils")
 local orientation = require("orientation")
 
-local Turtle = {
-    home_pos=nil,
-    curr_pos=nil,
-    orientation=nil,
-    on_move_cb=nil,
-}
+local Turtle = {}
 
 -- Uses the GPS API to get the current position of the turtle.
 --
@@ -67,27 +62,16 @@ end
 --          Called whenever the turtle moves to a new block.
 --      home_pos [vector]: Optional vector specifying the home position of the Turtle.
 --          If not specified, the current position of the turtle is used.
-function Turtle.__init__(o, args)
-    o = o or {}
-    setmetatable(o, self)
-    self.__index = self
-    self.__tostring = Turtle.__tostring
+function Turtle.__init__(base, args)
+    local self = {home_pos=nil, curr_pos=nil, orientation=nil, on_move_cb=nil}
+    setmetatable(self, {__index=Turtle, __tostring=Turtle.__tostring})
 
-    -- args is optional so if not passed we just set it to an empty table.
-    -- This prevents the following checks from erroring.
-    if args == nil then
-        args = {}
-    end
-
-    if args.home_pos ~= nil then
+    if args ~= nil then
         self.home_pos = args.home_pos
-    end
-
-    if args.on_move_cb ~= nil then
         self.on_move_cb = args.on_move_cb
     end
 
-    return o
+    return self
 end
 setmetatable(Turtle, {__call=Turtle.__init__})
 
@@ -254,6 +238,10 @@ end
 
 -- Moves the turtle to its home position.
 function Turtle:go_home()
+    if self.home_pos == nil then
+        print("go_home: turtle is not yet calibrated!")
+        return false
+    end
     return self:move_to(self.home_pos)
 end
 

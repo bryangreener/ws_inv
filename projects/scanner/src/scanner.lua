@@ -12,10 +12,7 @@ local home_pos = nil
 
 local dest_pos = nil
 
-local Scanner = {
-    turtle=nil,
-    mode=nil,
-}
+local Scanner = {}
 
 local function default_on_move_cb(pos, orientation)
     --print("on_move_cb: " .. textutils.serialize(pos))
@@ -63,42 +60,26 @@ end
 --      on_move_cb [function(vector, Orientation)]: Optional callback function reference.
 --          Called whenever the turtle moves to a new block.
 function Scanner.__init__(o, args)
-    o = o or {}
-    setmetatable(o, self)
-    self.__index = self
-    self.__tostring = Scanner.__tostring
-
-    local home_pos
-    local on_move_cb
-    local mode
+    local self = {turtle=nil, mode=nil}
+    setmetatable(self, {__index=Scanner, __tostring=Scanner.__tostring})
 
     print("Scanner: Initializing...")
 
-    -- args is optional so if not passed we just set it to an empty table.
-    -- This prevents the following checks from erroring.
-    if args == nil then
-        args = {}
+    if args ~= nil then
+        self.turtle = Turtle{home_pos=args.home_pos, on_move_cb=args.on_move_cb}
+        self.mode = args.mode
+    else:
+        self.turtle = Turtle()
     end
 
-    if args.home_pos ~= nil then
-        home_pos = args.home_pos
+    if utils.isempty(self.mode) then
+        self.mode = SCANNER_DEFAULT_MODE
     end
 
-    if args.on_move_cb ~= nil then
-        on_move_cb = args.on_move_cb
-    else
-        on_move_cb = default_on_move_cb
-    end
-
-    if utils.isempty(args.mode) then
-        mode = SCANNER_DEFAULT_MODE
-    end
-
-    self.turtle = Turtle{home_pos=home_pos, on_move_cb=on_move_cb}
     self.turtle:calibrate()
 
     print("Scanner: Initialized.")
-    return o
+    return self
 end
 setmetatable(Scanner, {__call=Scanner.__init__})
 
