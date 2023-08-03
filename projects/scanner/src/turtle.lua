@@ -1,5 +1,5 @@
 local utils = require("utils")
-local orientation = require("orientation")
+local Orientation = require("orientation")
 
 local Turtle = {}
 
@@ -150,7 +150,7 @@ end
 function Turtle:back()
     -- Change orientation to look behind us but dont actually turn since turning costs
     -- time. This just allows our position updating function to work properly.
-    local o = orientation.Orientation{cardinal=self.orientation:get()}
+    local o = Orientation{cardinal=self.orientation:get()}
     o:reverse()
     local res = turtle.back()
     -- Calculate new position while orientation is reversed
@@ -195,7 +195,7 @@ end
 
 -- Turns a turtle to the specified cardinal direction.
 function Turtle:turn_to(dest)
-    local delta = orientation.get_rotation_delta(nil, dest)
+    local delta = self.orientation:get_rotation_delta(nil, dest)
     if delta < 0 then
         return self:turn_left(math.abs(delta))
     else
@@ -219,7 +219,7 @@ function Turtle:move_to(dest, axis)
             return true
         end
         local sign = (d_c < 0) and "-" or "+"
-        if not self:turn_to(orientation.axis_and_sign_to_cardinal(axis, sign)) then
+        if not self:turn_to(self.orientation:axis_and_sign_to_cardinal(axis, sign)) then
             return false
         end
 
@@ -301,7 +301,7 @@ function Turtle:calibrate()
         (d_x + math.abs(d_x) * 2) +
         (d_z + math.abs(d_z) * 3)
     )
-    self.orientation = orientation.Orientation{axis=axis}
+    self.orientation = Orientation{axis=axis}
     -- Since we moved forward 1, we need to update the current position.
     self.curr_pos = new_pos
 

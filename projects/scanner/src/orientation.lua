@@ -2,9 +2,6 @@ local utils = require("utils")
 
 local Orientation = {}
 
--- This is what we return from this module for use with "require()".
-local orientation = {Orientation=Orientation}
-
 -- We will convert all orientations to cardinal throughout this program.
 local cardinal_directions = {
     ["n"]=1,
@@ -106,7 +103,7 @@ end
 
 -- Returns the number of 90 degree rotations needed to go from cardinal direction
 -- a to cardinal direction b.
-function get_rotation_delta(curr, dest)
+function Orientation:get_rotation_delta(curr, dest)
     assert(not utils.isempty(curr))
     assert(not utils.isempty(dest))
 
@@ -134,7 +131,7 @@ function get_rotation_delta(curr, dest)
     return delta
 end
 
-function axis_and_sign_to_cardinal(axis, sign)
+function Orientation:axis_and_sign_to_cardinal(axis, sign)
     assert(not utils.isempty(axis))
     assert(not utils.isempty(sign))
     axis = string.lower(axis)
@@ -144,4 +141,4 @@ function axis_and_sign_to_cardinal(axis, sign)
     return rot_to_card[sign .. axis]
 end
 
-return orientation
+return Orientation
