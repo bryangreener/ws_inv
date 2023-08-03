@@ -14,7 +14,7 @@ jobs:
 
       - name: Generate project list
         shell: bash
-        run: find ./projects -type f -name "*.lua" > ./projects/projects2.txt
+        run: find ./projects -type f -name "*.lua" > ./projects/projects.txt
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
