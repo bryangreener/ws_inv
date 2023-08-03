@@ -97,7 +97,7 @@ function Scanner.__tostring(o)
     ):format(tostring(o.turtle), mode)
 end
 
-function Scanner:scan(mode, end_pos, start_pos)
+function Scanner:scan(end_pos, start_pos, mode)
     if utils.isempty(mode) then
         mode = self.mode
     end
@@ -111,6 +111,12 @@ function Scanner:scan(mode, end_pos, start_pos)
     -- start_pos can be nil if we just want to use current turtle pos
     if start_pos == nil then
         start_pos = self.turtle:get_pos()
+    end
+
+    -- Move to start positon.
+    if not self.turtle:move_to(start_pos) then
+        print("Error moving to start position: " .. tostring(start_pos))
+        return false
     end
 
     if mode == "snake" then
