@@ -94,19 +94,20 @@ function Orientation:rotate(n)
     assert(type(n) == "number")
 
     if n == 0 then
-        return self.cardinal
+        return self:get()
     end
 
     local res = ((cardinal_directions[self.cardinal] + n) - 1) % 4
 
-    self.cardinal = cardinal_directions_arr[res+1]
+    self:set(cardinal_directions_arr[res+1])
 
-    return self.cardinal
+    return self:get()
 end
 
 -- Easy helper function to reverse our orientation (look behind).
 function Orientation:reverse()
     self:rotate(2)
+    return self:get()
 end
 
 -- Returns the number of 90 degree rotations needed to go from cardinal direction

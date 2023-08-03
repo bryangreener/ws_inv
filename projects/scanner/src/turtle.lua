@@ -148,16 +148,14 @@ end
 
 -- Moves turtle backward 1 block. Does not turn the turtle.
 function Turtle:back()
-    -- Change orientation to look behind us but dont actually turn
-    -- since turning costs time. This just allows our position updating function
-    -- to work properly.
-    self.orientation:reverse()
+    -- Change orientation to look behind us but dont actually turn since turning costs
+    -- time. This just allows our position updating function to work properly.
+    local o = orientation.Orientation{cardinal=self.orientation:get()}
+    o:reverse()
     local res = turtle.back()
-    -- Calculate new position while orientation is looking backward
+    -- Calculate new position while orientation is reversed
     -- but do not set it in case we failed to move.
-    local curr_pos = get_new_pos(self.orientation:get(), self.curr_pos)
-    -- Reset orientation to original position before checking errors
-    self.orientation:reverse()
+    local curr_pos = get_new_pos(o:get(), self.curr_pos)
 
     -- Now check if our movement failed.
     if not res then
@@ -281,7 +279,7 @@ end
 -- move in any direction, it returns back to the starting position and uses the deltas
 -- to calculate orientation. This function uses the GPS to determine current position.
 function Turtle:calibrate()
-    self.curr_pos = "blah"--vector.new(gps.locate())
+    self.curr_pos = vector.new(gps.locate())
     self.orientation = nil
 
     for i=1,4 do
