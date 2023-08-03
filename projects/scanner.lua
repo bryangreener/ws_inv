@@ -12,14 +12,6 @@ local Turtle = require("turtle.turtle")
 
 local SCANNER_DEFAULT_MODE = "snake"
 
-local home_x = -421
-local home_y = 60
-local home_z = 1719
-local home_pos = nil
-
-
-local dest_pos = nil
-
 local Scanner = {}
 
 local function default_on_move_cb(pos, orientation)
@@ -29,18 +21,24 @@ end
 local function scan_snake(_turtle, start_pos, end_pos)
     print(("Scanning: mode=snake, start=%s, end=%s"):format(tostring(start_pos), tostring(end_pos)))
     local res = true
-    local dir_x = ((end_pos.x - start_pos.x) < 0) and -1 or 1
 
-    for x=math.abs(start_pos.x),math.abs(end_pos.x)+1 do
+    local step = ((end_pos.x - start_pos.x) < 0) and -1 or 1
+    for x=start_pos.x,end_pos.x+1,step do
         res = _turtle:move_to(vector.new(x, start_pos.y, _turtle:get_pos().z))
-        if not res then break end
+        if not res then
+            break
+        end
 
         if (x - start_pos.x) % 2 == 0 then
             res = _turtle:move_to(vector.new(x, start_pos.y, end_pos.z + 1))
-            if not res then break end
+            if not res then
+                break
+            end
         else
             _turtle:move_to(vector.new(x, start_pos.y, start_pos.z))
-            if not res then break end
+            if not res then
+                break
+            end
         end
     end
 
@@ -50,7 +48,7 @@ local function scan_snake(_turtle, start_pos, end_pos)
     end
     
     print("Scanning complete.")
-    return res
+    return true
 end
 
 -- Class that handles scanning an area with a turtle.
