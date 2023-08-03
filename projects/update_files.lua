@@ -1,5 +1,3 @@
-print("Pulling changes...")
-
 local url = "https://bryangreener.github.io/ws_inv/projects/"
 
 if not fs.exists("projects") then
@@ -35,11 +33,13 @@ else
     fs.move("projects/new_git_hash.txt", "projects/git_hash.txt")
 
     if prev_hash == new_hash then
+        print("No remote changes to fetch.")
         return nil
     end
 end
 
 -- Now pull the changes.
+print("Pulling changes...")
 wget(url .. "projects.txt", "projects/projects.txt")
 wget(url .. "timestamp.txt", "projects/timestamp.txt")
 
