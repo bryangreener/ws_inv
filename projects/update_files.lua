@@ -39,8 +39,6 @@ else
 end
 
 -- Now pull the changes.
-local w = window.create(term.current(), 1, 1, 1, 1, false)
-term.redirect(w)
 wget(url .. "projects.txt", "projects/projects.txt")
 wget(url .. "timestamp.txt", "projects/timestamp.txt")
 
