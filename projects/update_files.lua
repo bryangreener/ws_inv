@@ -39,9 +39,22 @@ end
 
 -- Now pull the changes.
 print("Pulling changes...")
+
+-- Need to delete these two files if they exist since we always want the newest
+-- versions from remote.
+if fs.exists("projects/files.txt") do
+    fs.delete("projects/files.txt")
+end
+
+if fs.exists("projects/timestamp.txt") do
+    fs.delete("projects/timestamp.txt")
+end
+
+-- download newest versions
 wget(url .. "projects/files.txt", "projects/files.txt")
 wget(url .. "projects/timestamp.txt", "projects/timestamp.txt")
 
+-- Download/replace each file from the list of files.
 for line in io.lines("projects/files.txt") do
     if fs.exists(line) and not fs.isDir(line) then
         fs.delete(line)
