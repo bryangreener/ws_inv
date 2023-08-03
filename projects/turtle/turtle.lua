@@ -78,6 +78,12 @@ function Turtle.__init__(base, args)
         self.gps = TURTLE_DEFAULT_GPS
     end
 
+    if not self.gps then
+        print("WARNING: Using Turtle without GPS.")
+        print("Coordinates for movement are relative to turtle start position:")
+        print("    -x=left, +x=right, -z=forward, +z=back")
+    end
+
     return self
 end
 setmetatable(Turtle, {__call=Turtle.__init__})
@@ -298,6 +304,9 @@ function Turtle:calibrate()
         print("Calibrating without GPS.")
         self.curr_pos = vector.new(0, 0, 0)
         self.orientation = Orientation{cardinal="n"}
+        if self.home_pos == nil then
+            self.home_pos = self.curr_pos
+        end
         return true
     end
 
