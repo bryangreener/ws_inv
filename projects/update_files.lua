@@ -1,22 +1,21 @@
-local url = "https://bryangreener.github.io/ws_inv/projects/"
+local url = "https://bryangreener.github.io/ws_inv/"
 
 if not fs.exists("projects") then
     fs.makeDir("projects")
 end
 
 function wget(src, dest)
-    local w = window.create(term.current(), 1, 1, 1, 1, false)
+    local prev = term.current()
+    local w = window.create(prev, 1, 1, 1, 1, false)
     term.redirect(w)
     term.write("Downloading...")
     shell.run("wget", src, dest)
-    w.clear()
-    term.clear()
-    term.redirect(term.native())
+    term.redirect(prev)
     print("=> " .. dest)
 end
 
 -- First check if we even need to pull any changes.
-wget(url .. "git_hash.txt", "projects/new_git_hash.txt")
+wget(url .. "projects/git_hash.txt", "projects/new_git_hash.txt")
 if not fs.exists("projects/git_hash.txt") then
     fs.move("projects/new_git_hash.txt", "projects/git_hash.txt")
     fs.delete("projects/new_git_hash.txt")
@@ -40,8 +39,8 @@ end
 
 -- Now pull the changes.
 print("Pulling changes...")
-wget(url .. "files.txt", "projects/files.txt")
-wget(url .. "timestamp.txt", "projects/timestamp.txt")
+wget(url .. "projects/files.txt", "projects/files.txt")
+wget(url .. "projects/timestamp.txt", "projects/timestamp.txt")
 
 for line in io.lines("projects/files.txt") do
     if fs.exists(line) and not fs.isDir(line) then
