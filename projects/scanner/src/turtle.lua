@@ -302,7 +302,10 @@ function Turtle:calibrate()
         (d_z + math.abs(d_z) * 3)
     )
     self.orientation = orientation.Orientation{axis=axis}
+    -- Since we moved forward 1, we need to update the current position.
+    self.curr_pos = new_pos
 
+    -- Return back to origin of calibration.
     if self.home_pos == nil then
         self:back()
         self.home_pos = self.curr_pos
