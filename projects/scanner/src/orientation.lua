@@ -100,7 +100,7 @@ end
 -- n is the number of 90 degree turns to make.
 -- positive n will be clockwise (right), negative is CCW (left).
 function Orientation:rotate(n)
-    local res = ((n * 90) / (360 / #cardinal_directions)) % #cardinal_directions
+    local res = ((n * 90) / (360 / #cardinal_directions_r)) % #cardinal_directions_r
     self.cardinal = cardinal_directions_r[res+1]
 end
 
