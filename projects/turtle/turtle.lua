@@ -264,6 +264,8 @@ function Turtle:move_to(dest, axis)
             return true
         end
 
+        local sign = (d_c < 0) and "-" or "+"
+
         local move_fn
         if axis == "x" or axis == "z" then
             move_fn = self.forward
@@ -271,18 +273,14 @@ function Turtle:move_to(dest, axis)
             move_fn = (sign == "+") and self.up or self.down
         end
         
-        local sign = (d_c < 0) and "-" or "+"
         if axis ~= "y" then
-            local cardinal = self.orientation:axis_and_sign_to_cardinal(axis, sign)
-            if not self:turn_to(cardinal) then
+            if not self:turn_to(self.orientation:axis_and_sign_to_cardinal(axis, sign)) then
                 return false
             end
         end
 
-        local res
         while d_c ~= 0 do
-            res = move_fn(self)
-            if not res then
+            if not move_fn(self) then
                 print("TurtleError: Movement blocked.")
                 return false
             end
