@@ -186,7 +186,7 @@ end
 
 -- Turns a turtle to the specified cardinal direction.
 function Turtle:turn_to(dest)
-    local delta = self.orientation.get_rotation_delta(nil, dest)
+    local delta = self.orientation:get_rotation_delta(nil, dest)
     if delta < 0 then
         return self.turn_left(math.abs(delta))
     else
@@ -251,7 +251,7 @@ function Turtle:is_facing(d)
     if d ~= nil then
         d = string.lower(d)
     end
-    return self.orientation.get() == d
+    return self.orientation:get() == d
 end
 
 -- Calibrates the turtle by calculating the current position and orientation.
