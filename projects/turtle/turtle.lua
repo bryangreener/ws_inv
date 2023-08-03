@@ -41,6 +41,10 @@ local function get_new_pos(cardinal, prev_pos)
         z = z + 1
     elseif cardinal == "w" then
         x = x - 1
+    elseif cardinal == "up" then
+        y = y + 1
+    elseif cardinal == "down" then
+        y = y - 1
     else
         error("get_new_pos: ValueError: invalid cardinal direction: " .. cardinal)
     end
@@ -81,7 +85,8 @@ function Turtle.__init__(base, args)
     if not self.gps then
         print("WARNING: Using Turtle without GPS.")
         print("Coordinates for movement are relative to turtle start position:")
-        print("    -x=left, +x=right, -z=forward, +z=back")
+        print("    -x=left, +x=right")
+        print("    -z=forward, +z=back")
     end
 
     return self
@@ -199,6 +204,30 @@ function Turtle:right()
         return res
     end
     return self:forward()
+end
+
+function Turtle:up()
+    local res = turtle.up()
+    if not res then
+        return res
+    end
+    self.curr_pos = get_new_pos("up", self.curr_pos)
+
+    self:on_move()
+
+    return res
+end
+
+function Turtle:down()
+    local res = turtle.down()
+    if not res then
+        return res
+    end
+    self.curr_pos = get_new_pos("down", self.curr_pos)
+
+    self:on_move()
+
+    return res
 end
 
 -- Returns the current vector position of the turtle from memory.
@@ -348,5 +377,41 @@ function Turtle:calibrate()
 
     return true
 end
+
+-- Direct wrappers around turtle API functions.
+Turtle.craft = turtle.craft
+Turtle.dig = turtle.dig
+Turtle.dig_up = turtle.digUp
+Turtle.dig_down = turtle.digDown
+Turtle.place = turtle.place
+Turtle.place_up = turtle.placeUp
+Turtle.place_down = turtle.placeDown
+Turtle.drop = turtle.drop
+Turtle.drop_up = turtle.dropUp
+Turtle.drop_down = turtle.dropDown
+Turtle.select = turtle.select
+Turtle.get_item_count = turtle.getItemCount
+Turtle.get_item_space = turtle.getItemSpace
+Turtle.detect = turtle.detect
+Turtle.detect_up = turtle.detectUp
+Turtle.detect_down = turtle.detectDown
+Turtle.compare = turtle.compare
+Turtle.compare_up = turtle.compareUp
+Turtle.compare_down = turtle.compareDown
+Turtle.suck = turtle.suck
+Turtle.suck_up = turtle.suckUp
+Turtle.suck_down = turtle.suckDown
+Turtle.get_fuel_level = turtle.getFuelLevel
+Turtle.refuel = turtle.refuel
+Turtle.compare_to = turtle.compareTo
+Turtle.transfer_to = turtle.transferTo
+Turtle.get_selected_slot = turtle.getSelectedSlot
+Turtle.get_fuel_limit = turtle.getFuelLimit
+Turtle.equip_left = turtle.equipLeft
+Turtle.equip_right = turtle.equipRight
+Turtle.inspect = turtle.inspect
+Turtle.inspect_up = turtle.inspectUp
+Turtle.inspect_down = turtle.inspectDown
+Turtle.get_item_detail = turtle.getItemDetail
 
 return Turtle
