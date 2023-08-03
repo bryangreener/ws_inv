@@ -1,8 +1,12 @@
 local utils = require("utils")
-local Orientation = require("orientation")
+local orientation = require("orientation")
 
 local Turtle = {}
 
+-- Uses the GPS API to get the current position of the turtle.
+--
+-- Returns:
+--      vector: The current turtle position as a vector instance.
 local function get_gps_pos()
     local x, y, z = gps.locate()
     if x == nil or y == nil or z == nil then
@@ -11,22 +15,32 @@ local function get_gps_pos()
     return vector.new(x, y, z)
 end
 
-local function get_new_pos(orientation, curr_pos)
-    local card = orientation:get()
-    local x = curr_pos.x
-    local y = curr_pos.y
-    local z = curr_pos.z
+-- Gets the current turtle position after having moved.
+--
+-- The cardinal direction is used to determine which axis we moved along and the
+-- direction along that axis.
+--
+-- Args:
+--      cardinal [str]: The cardinal direction that the turtle is facing.
+--      prev_pos [vector]: The previous position of the turtle.
+--
+-- Returns:
+--      vector: The new turtle's position as a vector instance.
+local function get_new_pos(cardinal, prev_pos)
+    local x = prev_pos.x
+    local y = prev_pos.y
+    local z = prev_pos.z
 
-    if card == "n" then
-        z = z - 1    
-    elseif card == "e" then
+    if cardinal == "n" then
+        z = z - 1
+    elseif cardinal == "e" then
         x = x + 1
-    elseif card == "s" then
+    elseif cardinal == "s" then
         z = z + 1
-    elseif card == "w" then
+    elseif cardinal == "w" then
         x = x - 1
     else
-        error("get_new_pos: ValueError: invalid cardinal direction: " .. card)
+        error("get_new_pos: ValueError: invalid cardinal direction: " .. cardinal)
     end
 
     return vector.new(x, y, z)
@@ -39,7 +53,7 @@ end
 -- Members:
 --      home_pos: See this class's "Args" section.
 --      curr_pos [vector]: The current position of the turtle. Nil until calibrated.
---      orientation [Orientation]: Current orientation of the turtle. Nil until calibrated.
+--      _orientation [Orientation]: Current orientation of the turtle. Nil until calibrated.
 --      on_move_cb: See this class's "Args" section.
 --
 -- Args:
@@ -65,6 +79,7 @@ function Turtle.__init__(base, on_move_cb, home_pos)
 end
 setmetatable(Turtle, {__call=Turtle.__init__})
 
+-- Overrides the tostring() method with a custom string.
 function Turtle.__tostring()
     return (
         "<Turtle: home_pos=%s, curr_pos=%s, orientation=%s>"
@@ -76,7 +91,7 @@ function Turtle.__tostring()
 end
 
 -- Handles events where the turtle has moved to a new coordinate.
--- Calls the on_move_cb callback if it is not nil
+-- Calls the on_move_cb callback if it is not nil.
 function Turtle:on_move()
     if self.on_move_cb ~= nil then
         self.on_move_cb(self.curr_pos, self.orientation)
@@ -128,7 +143,7 @@ function Turtle:forward()
     if not res then
         return res
     end
-    self.curr_pos = get_new_pos(self.orientation, self.curr_pos)
+    self.curr_pos = get_new_pos(self.orientation:get(), self.curr_pos)
 
     self:on_move()
 
@@ -140,13 +155,13 @@ function Turtle:back()
     -- Change orientation to look behind us but dont actually turn
     -- since turning costs time. This just allows our position updating function
     -- to work properly.
-    self.orientation:rotate(2)
+    self.orientation:reverse()
     local res = turtle.back()
     -- Calculate new position while orientation is looking backward
     -- but do not set it in case we failed to move.
-    local curr_pos = get_new_pos(self.orientation, self.curr_pos)
+    local curr_pos = get_new_pos(self.orientation:get(), self.curr_pos)
     -- Reset orientation to original position before checking errors
-    self.orientation:rotate(-2)
+    self.orientation:reverse()
 
     -- Now check if our movement failed.
     if not res then
@@ -186,7 +201,7 @@ end
 
 -- Turns a turtle to the specified cardinal direction.
 function Turtle:turn_to(dest)
-    local delta = self.orientation:get_rotation_delta(nil, dest)
+    local delta = orientation.get_rotation_delta(nil, dest)
     if delta < 0 then
         return self:turn_left(math.abs(delta))
     else
@@ -196,17 +211,23 @@ end
 
 function Turtle:move_to(dest, axis)
     if utils.isempty(axis) then
-        self:move_to(dest, "x")
-        self:move_to(dest, "z")
+        if not self:move_to(dest, "x") then
+            return false
+        end
+        if not self:move_to(dest, "z") then
+            return false
+        end
     else
         c0 = self.curr_pos[axis]
         c1 = dest[axis]
         local d_c = c1 - c0
-        local sign = "+"
-        if d_c < 0 then
-            sign = "-"
+        if d_c == 0 then
+            return true
         end
-        self:turn_to(self.orientation:axis_and_sign_to_cardinal(axis, sign))
+        local sign = (d_c < 0) and "-" or "+"
+        if not self:turn_to(orientation.axis_and_sign_to_cardinal(axis, sign)) then
+            return false
+        end
 
         while d_c ~= 0 do
             if not self:forward() then
@@ -278,11 +299,11 @@ function Turtle:calibrate()
 
     local d_x = new_pos.x - self.curr_pos.x
     local d_z = new_pos.z - self.curr_pos.z
-    local v = (
+    local axis = (
         (d_x + math.abs(d_x) * 2) +
         (d_z + math.abs(d_z) * 3)
     )
-    self.orientation = Orientation{v=v}
+    self.orientation = orientation.Orientation{axis=axis}
 
     if self.home_pos == nil then
         self:back()

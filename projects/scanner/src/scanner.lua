@@ -15,7 +15,7 @@ local dest_pos = nil
 local Scanner = {}
 
 local function default_on_move_cb(pos, orientation)
-    print("on_move_cb: " .. textutils.serialize(pos))
+    --print("on_move_cb: " .. textutils.serialize(pos))
 end
 
 local function scan_snake(_turtle, start_pos, end_pos)

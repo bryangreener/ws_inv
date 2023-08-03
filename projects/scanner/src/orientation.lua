@@ -1,5 +1,7 @@
 local utils = require("utils")
 
+local orientation = {}
+
 local Orientation = {}
 
 -- We will convert all orientations to cardinal throughout this program.
@@ -9,70 +11,60 @@ local cardinal_directions = {
     ["s"]=3,
     ["w"]=4,
 }
-local cardinal_directions_r = utils.invert_table(cardinal_directions)
+-- Convert to array representation
+local cardinal_directions_arr = utils.invert_table(cardinal_directions)
 
-local rot_to_card = {
+local axis_to_cardinal = {
     ["-z"]="n",
     ["+x"]="e",
     ["+z"]="s",
     ["-x"]="w",
 }
-local card_to_rot = utils.invert_table(rot_to_card)
+local cardinal_to_axis = utils.invert_table(axis_to_cardinal)
 
-local rot_to_int = {
+local axis_to_int = {
     ["-z"]=2,
     ["+x"]=3,
     ["+z"]=4,
     ["-x"]=1,
 }
-local int_to_rot = utils.invert_table(rot_to_int)
+local int_to_axis = utils.invert_table(axis_to_int)
 
-local card_to_int = {}
-for k, v in pairs(card_to_rot) do
-    card_to_int[k] = rot_to_int[v]
+local cardinal_to_int = {}
+for k, v in pairs(cardinal_to_axis) do
+    cardinal_to_int[k] = axis_to_int[v]
 end
-local int_to_card = utils.invert_table(card_to_int)
+local int_to_cardinal = utils.invert_table(cardinal_to_int)
 
--- Must supply a table with one of card, rot, or v
+-- Must supply a table with one of cardinal or axis.
+-- Axis may be either a string or numerical representation (i.e. -x or 1)
 -- Examples:
----     local o0 = Orientation{card="n"}
----     local o1 = Orientation{rot="-x"}
----     local o2 = Orientation{v=1}
+---     local o0 = Orientation{cardinal="n"}
+---     local o1 = Orientation{axis="-x"}
+---     local o2 = Orientation{axis=1}
 function Orientation.__init__(base, args)
-    local card
+    local cardinal
 
-    if args == nil then
-        args = {}
-    end
-    -- Mandatory arguments
-    if (args.card == nil and args.rot == nil and args.v == nil) then
-        error("ValueError: Must supply one of [card, rot, v]")
-    end
-    if args.card ~= nil and type(args.card) ~= "string" then
-        error(("ValueError: card must be a string. Got %s"):format(type(args.card)))
-    end
-    if args.rot ~= nil and type(args.rot) ~= "string" then
-        error(("ValueError: rot must be a string. Got %s"):format(type(args.rot)))
-    end
-    if args.v ~= nil and type(args.v) ~= "number" then
-        error(("ValueError: v must be a number. Got %s"):format(type(args.v)))
+    assert(args ~= nil)
+    assert(args.cardinal ~= nil or args.axis ~= nil)
+
+    if args.cardinal ~= nil then
+        assert(type(args.cardinal) == "string")
+        cardinal = string.lower(args.cardinal)
     end
 
-    if args.card ~= nil then
-        card = string.lower(args.card)
-    elseif args.rot ~= nil then
-        card = rot_to_card[string.lower(args.rot)]
-    elseif args.v ~= nil then
-        card = int_to_card[args.v]
+    if args.axis ~= nil then
+        assert(type(args.axis) == "string" or type(args.axis) == "number")
+        if type(args.axis) == "string" then
+            cardinal = axis_to_cardinal[string.lower(args.axis)]
+        elseif type(args.axis) == "number" then
+            cardinal = int_to_cardinal[args.axis]
+        end
     end
 
-    if card == nil then
-        error("ValueError: invalid inputs: " .. textutils.serialize(args))
-    end
+    assert(not utils.isempty(cardinal))
 
-    self = {
-        cardinal=card,
-    }
+    self = {cardinal=cardinal}
     setmetatable(
         self,
         {
@@ -93,54 +85,74 @@ function Orientation:get()
     return self.cardinal
 end
 
-function Orientation:update(new_card)
-    self.cardinal = new_card
+-- Sets the cardinal direction.
+function Orientation:set(cardinal)
+    assert(not utils.isempty(cardinal))
+    cardinal = string.lower(cardinal)
+    assert(cardinal_directions[cardinal] ~= nil)
+    self.cardinal = cardinal
 end
 
 -- n is the number of 90 degree turns to make.
 -- positive n will be clockwise (right), negative is CCW (left).
+-- Updates the local cardinal direction and returns it.
 function Orientation:rotate(n)
-    local res = ((n * 90) / (360 / #cardinal_directions_r)) % #cardinal_directions_r
-    self.cardinal = cardinal_directions_r[res+1]
+    assert(type(n) == "number")
+
+    if n == 0 then
+        return self.cardinal
+    end
+
+    local res = ((cardinal_directions[self.cardinal] + n) - 1) % 4
+
+    self.cardinal = cardinal_directions_arr[res+1]
+
+    return self.cardinal
+end
+
+-- Easy helper function to reverse our orientation (look behind).
+function Orientation:reverse()
+    self:rotate(2)
 end
 
 -- Returns the number of 90 degree rotations needed to go from cardinal direction
 -- a to cardinal direction b.
-function Orientation:get_rotation_delta(curr, dest)
-    if utils.isempty(curr) then
-        curr = self.cardinal
-    end
+function get_rotation_delta(curr, dest)
+    assert(not utils.isempty(curr))
+    assert(not utils.isempty(dest))
+
+    local delta
     local i_0 = cardinal_directions[curr]
     local i_1 = cardinal_directions[dest]
-    local delta = i_1 - i_0
-
+    
     -- Handle wraparound cases to speed up movements.
     -- This makes it so instead of turning three times one direction, we can instead
     -- just turn once in the opposite direction to reach the same orientation.
     if i_0 == 1 and i_1 == 4 then
-        delta = 1
-    elseif i_0 == 4 and i_1 == 1 then
         delta = -1
+    elseif i_0 == 4 and i_1 == 1 then
+        delta = 1
+    else
+        delta = i_1 - i_0
+    end
+
+    -- Always ensure we turn the same direction when turning twice.
+    -- This just helps with consistency and debugging.
+    if math.abs(delta) == 2 then
+        delta = 2
     end
 
     return delta
 end
 
-function Orientation:axis_and_sign_to_cardinal(axis, sign)
-    if utils.isempty(axis) then
-        error("ValueError: axis is nil")
-    end
+function axis_and_sign_to_cardinal(axis, sign)
+    assert(not utils.isempty(axis))
+    assert(not utils.isempty(sign))
     axis = string.lower(axis)
+    assert(axis == "x" or axis == "z")
+    assert(sign == "-" or sign == "+")
 
-    if not (axis == "x" or axis == "z") then
-        error("ValueError: invalid axis: " .. axis)
-    end
-
-    if not (sign == "-" or sign == "+") then
-        error("ValueError: invalid sign: " .. sign)
-    end
-    
-    return rot_to_card[string.lower(sign .. axis)]
+    return rot_to_card[sign .. axis]
 end
 
-return Orientation
+return orientation
