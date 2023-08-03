@@ -1,6 +1,8 @@
 local utils = require("utils")
 local Orientation = require("orientation")
 
+local TURTLE_DEFAULT_GPS = true
+
 local Turtle = {}
 
 -- Uses the GPS API to get the current position of the turtle.
@@ -63,12 +65,17 @@ end
 --      home_pos [vector]: Optional vector specifying the home position of the Turtle.
 --          If not specified, the current position of the turtle is used.
 function Turtle.__init__(base, args)
-    local self = {home_pos=nil, curr_pos=nil, orientation=nil, on_move_cb=nil}
+    local self = {home_pos=nil, curr_pos=nil, orientation=nil, on_move_cb=nil, gps=nil}
     setmetatable(self, {__index=Turtle, __tostring=Turtle.__tostring})
 
     if args ~= nil then
         self.home_pos = args.home_pos
         self.on_move_cb = args.on_move_cb
+        self.gps = args.gps
+    end
+
+    if self.gps == nil then
+        self.gps = TURTLE_DEFAULT_GPS
     end
 
     return self
@@ -246,19 +253,25 @@ end
 -- Returns the current vector position of the turtle.
 -- If specified or curr_pos is nil then GPS will be used to get the current
 -- position of the turtle.
-function Turtle:get_pos(gps_override)
+function Turtle:get_pos(override)
     local x, y, z
-    -- If curr_pos is nil, then we MUST use GPS to get pos.
+    -- If curr_pos is nil, then we MUST get a new position.
     if self.curr_pos == nil then
-        gps_override = true
+        override = true
     end
-    if gps_override == nil then
-        gps_override = false
+    if override == nil then
+        override = false
     end
 
-    if gps_override then
-        return get_gps_pos()
+    -- If override is specified, then we get a fresh location.
+    if override then
+        if self.gps then
+            return get_gps_pos()
+        else
+            return vector.new(0, 0, 0)
+        end
     end
+    -- Otherwise, we just return the current position.
     return self:get_curr_pos()
 end
 
@@ -277,7 +290,8 @@ end
 --
 -- Attempts to move the turtle in each of the cardinal directions. As soon as it can
 -- move in any direction, it returns back to the starting position and uses the deltas
--- to calculate orientation. This function uses the GPS to determine current position.
+-- to calculate orientation.
+-- This function uses the GPS to determine current position.
 function Turtle:calibrate()
     self.curr_pos = vector.new(gps.locate())
     self.orientation = nil
