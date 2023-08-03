@@ -1,6 +1,6 @@
 print("Pulling changes...")
 
-local url = "https://bryangreener.github.io/ws_inv/projects"
+local url = "https://bryangreener.github.io/ws_inv/projects/"
 
 shell.run("wget", url .. "projects.txt", "projects.txt")
 
