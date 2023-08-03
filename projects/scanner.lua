@@ -65,6 +65,8 @@ end
 --          If not specified, will use the current turtle position.
 --      on_move_cb [function(vector, Orientation)]: Optional callback function reference.
 --          Called whenever the turtle moves to a new block.
+--      gps [bool]: Whether to enable GPS. If false, then all movement will be relative
+--          to the starting position of the turtle.
 function Scanner.__init__(o, args)
     local self = {turtle=nil, mode=nil}
     setmetatable(self, {__index=Scanner, __tostring=Scanner.__tostring})
@@ -72,7 +74,11 @@ function Scanner.__init__(o, args)
     print("Scanner: Initializing...")
 
     if args ~= nil then
-        self.turtle = Turtle{home_pos=args.home_pos, on_move_cb=args.on_move_cb}
+        self.turtle = Turtle{
+            home_pos=args.home_pos,
+            on_move_cb=args.on_move_cb,
+            gps=args.gps,
+        }
         self.mode = args.mode
     else
         self.turtle = Turtle()

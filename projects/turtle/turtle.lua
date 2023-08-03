@@ -293,6 +293,16 @@ end
 -- to calculate orientation.
 -- This function uses the GPS to determine current position.
 function Turtle:calibrate()
+    -- calibrate without GPS if GPS mode is disabled.
+    if not self.gps then
+        print("Calibrating without GPS.")
+        self.curr_pos = vector.new(0, 0, 0)
+        self.orientation = Orientation{cardinal="n"}
+        return true
+    end
+
+    -- otherwise, use GPS to calibrate.
+
     self.curr_pos = vector.new(gps.locate())
     self.orientation = nil
 
