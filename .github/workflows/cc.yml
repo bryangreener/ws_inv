@@ -18,6 +18,7 @@ jobs:
           cd projects
           find . -type f -name "*.lua" > ./projects.txt
           git log -1 --format="%at" | xargs -I{} date -d @{} +%Y/%m/%d_%H:%M:%S >> ./timestamp.txt
+          git rev-parse --short HEAD > ./git_hash.txt
           cd ..
 
       - name: Deploy
