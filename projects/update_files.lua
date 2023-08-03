@@ -3,6 +3,7 @@ print("Pulling changes...")
 local url = "https://bryangreener.github.io/ws_inv/projects/"
 
 shell.run("wget", url .. "projects.txt", "projects.txt")
+shell.run("wget", url .. "timestamp.txt", "timestamp.txt")
 
 for line in io.lines("projects.txt") do
     if fs.exists(line) and not fs.isDir(line) then
@@ -17,6 +18,12 @@ for line in io.lines("projects.txt") do
     shell.run("wget", url .. new_fp, new_fp)
 end
 
+-- Should only be one line in this file.
+local ts_file = fs.open("timestamp.txt", "r")
+print("TIMESTAMP: " .. ts_file.readAll())
+ts_file.close()
+
 fs.delete("projects.txt")
+fs.delete("timestamp.txt")
 
 print("Pulled changes.")

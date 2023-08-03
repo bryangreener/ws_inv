@@ -14,7 +14,11 @@ jobs:
 
       - name: Generate project list
         shell: bash
-        run: cd projects && find . -type f -name "*.lua" > ./projects.txt && cd ..
+        run: |
+          cd projects
+          find . -type f -name "*.lua" > ./projects.txt
+          git log -1 --format="%at" | xargs -I{} date -d @{} +%Y/%m/%d_%H:%M:%S >> ./timestamp.txt
+          cd ..
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
