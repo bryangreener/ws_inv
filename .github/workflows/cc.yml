@@ -1,4 +1,4 @@
-name: CC Program Build
+name: CC Program Builder
 
 on:
   push:
