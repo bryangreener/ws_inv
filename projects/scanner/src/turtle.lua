@@ -117,9 +117,9 @@ end
 
 -- Helper function to turn twice so the turtle is facing opposite direction.
 function Turtle:turn_back()
-    local res = self.turn_right()
+    local res = self:turn_right()
     if not res then return res end
-    return self.turn_right()
+    return self:turn_right()
 end
 
 -- Moves turtle forward 1 block.
@@ -130,7 +130,7 @@ function Turtle:forward()
     end
     self.curr_pos = get_new_pos(self.orientation, self.curr_pos)
 
-    self.on_move()
+    self:on_move()
 
     return res
 end
@@ -156,27 +156,27 @@ function Turtle:back()
     -- Successful movement. Now we can set the new position.
     self.curr_pos = curr_pos
 
-    self.on_move()
+    self:on_move()
     
     return res
 end
 
 -- Moves the turtle left one block. Turtle turns to face left.
 function Turtle:left()
-    local res = self.turn_left()
+    local res = self:turn_left()
     if not res then
         return res
     end
-    return self.forward()
+    return self:forward()
 end
 
 -- Moves the turtle right one block. Turtle turns to face right.
 function Turtle:right()
-    local res = self.turn_right()
+    local res = self:turn_right()
     if not res then
         return res
     end
-    return self.forward()
+    return self:forward()
 end
 
 -- Returns the current vector position of the turtle from memory.
@@ -188,9 +188,9 @@ end
 function Turtle:turn_to(dest)
     local delta = self.orientation:get_rotation_delta(nil, dest)
     if delta < 0 then
-        return self.turn_left(math.abs(delta))
+        return self:turn_left(math.abs(delta))
     else
-        return self.turn_right(math.abs(delta))
+        return self:turn_right(math.abs(delta))
     end
 end
 
@@ -206,10 +206,10 @@ function Turtle:move_to(dest, axis)
         if d_c < 0 then
             sign = "-"
         end
-        self.turn_to(self.orientation:axis_and_sign_to_cardinal(axis, sign))
+        self:turn_to(self.orientation:axis_and_sign_to_cardinal(axis, sign))
 
         while d_c ~= 0 do
-            if not self.forward() then
+            if not self:forward() then
                 print("TurtleError: Movement blocked.")
                 return false
             end
@@ -221,7 +221,7 @@ end
 
 -- Moves the turtle to its home position.
 function Turtle:go_home()
-    return self.move_to(self.home_pos)
+    return self:move_to(self.home_pos)
 end
 
 -- Returns the current vector position of the turtle.
@@ -240,7 +240,7 @@ function Turtle:get_pos(gps_override)
     if gps_override then
         return get_gps_pos()
     end
-    return self.get_curr_pos()
+    return self:get_curr_pos()
 end
 
 -- Returns whether the turtle is facing the specified cardinal direction.
@@ -285,10 +285,10 @@ function Turtle:calibrate()
     self.orientation = Orientation{v=v}
 
     if self.home_pos == nil then
-        self.back()
+        self:back()
         self.home_pos = self.curr_pos
     else
-        self.go_home()
+        self:go_home()
     end
 
     return true
