@@ -72,29 +72,31 @@ function Scanner.__init__(base, args)
     end
 
     local _turtle = Turtle(on_move_cb, home_pos)
+    print(tostring(_turtle))
+    print(_turtle.calibrate())
 
     self = {
         turtle=_turtle,
         mode=mode,
     }
-    setmetatable(self, {__index=Scanner})
     setmetatable(
         self,
         {
-            __tostring=function()
-                return (
-                    "<Scanner:\n\tturtle=%s\n\tmode=%s>"
-                ):format(tostring(self.turtle), mode)
-            end
+            __index=Scanner,
+            __tostring=Scanner.__tostring,
         }
     )
-
-    self.turtle:calibrate()
 
     print("Scanner: Initialized.")
     return self
 end
 setmetatable(Scanner, {__call=Scanner.__init__})
+
+function Scanner.__tostring()
+    return (
+        "<Scanner:\n\tturtle=%s\n\tmode=%s>"
+    ):format(tostring(self.turtle), mode)
+end
 
 function Scanner:scan(mode, end_pos, start_pos)
     if utils.isempty(mode) then

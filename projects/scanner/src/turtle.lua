@@ -54,24 +54,26 @@ function Turtle.__init__(base, on_move_cb, home_pos)
         orientation=nil,
         on_move_cb=on_move_cb
     }
-    setmetatable(self, {__index=Turtle})
     setmetatable(
         self,
         {
-            __tostring=function()
-                return (
-                    "<Turtle: home_pos=%s, curr_pos=%s, orientation=%s>"
-                ):format(
-                    tostring(self.home_pos),
-                    tostring(self.curr_pos),
-                    tostring(self.orientation)
-                )
-            end
+            __index=Turtle,
+            __tostring=Turtle.__tostring,
         }
     )
     return self
 end
 setmetatable(Turtle, {__call=Turtle.__init__})
+
+function Turtle.__tostring()
+    return (
+        "<Turtle: home_pos=%s, curr_pos=%s, orientation=%s>"
+    ):format(
+        tostring(self.home_pos),
+        tostring(self.curr_pos),
+        tostring(self.orientation)
+    )
+end
 
 -- Handles events where the turtle has moved to a new coordinate.
 -- Calls the on_move_cb callback if it is not nil
