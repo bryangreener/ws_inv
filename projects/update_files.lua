@@ -13,6 +13,7 @@ function wget(src, dest)
     shell.run("wget", src, dest)
     w.clear()
     term.clear()
+    term.redirect(term.native())
     print("=> " .. dest)
 end
 
