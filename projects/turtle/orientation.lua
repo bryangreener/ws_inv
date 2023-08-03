@@ -1,4 +1,4 @@
-local utils = require("utils")
+local utils = require("utils.utils")
 
 local Orientation = {}
 
@@ -104,7 +104,9 @@ end
 -- Returns the number of 90 degree rotations needed to go from cardinal direction
 -- a to cardinal direction b.
 function Orientation:get_rotation_delta(curr, dest)
-    assert(not utils.isempty(curr))
+    if utils.isempty(curr) then
+        curr = self.cardinal
+    end
     assert(not utils.isempty(dest))
 
     local delta
@@ -138,7 +140,7 @@ function Orientation:axis_and_sign_to_cardinal(axis, sign)
     assert(axis == "x" or axis == "z")
     assert(sign == "-" or sign == "+")
 
-    return rot_to_card[sign .. axis]
+    return axis_to_cardinal[sign .. axis]
 end
 
 return Orientation

@@ -1,5 +1,5 @@
-local utils = require("utils")
-local Orientation = require("orientation")
+local utils = require("utils.utils")
+local Orientation = require("turtle.orientation")
 
 local TURTLE_DEFAULT_GPS = true
 

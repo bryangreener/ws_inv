@@ -1,6 +1,14 @@
-local utils = require("utils")
-local inventory = require("inventory")
-local Turtle = require("turtle")
+-- This adds this file's directory to the package.path.
+-- Using "require()" in subdirectories requires they reference modules
+-- as if from this file's path.
+-- For example, in projects/turtle/orientation.lua we include projects/utils/utils.lua
+-- like so:
+--      local utils = require("utils.utils")
+package.path = package.path .. ";../?.lua"
+
+local utils = require("utils.utils")
+local inventory = require("utils.inventory")
+local Turtle = require("turtle.turtle")
 
 local SCANNER_DEFAULT_MODE = "snake"
 
@@ -68,7 +76,7 @@ function Scanner.__init__(o, args)
     if args ~= nil then
         self.turtle = Turtle{home_pos=args.home_pos, on_move_cb=args.on_move_cb}
         self.mode = args.mode
-    else:
+    else
         self.turtle = Turtle()
     end
 
