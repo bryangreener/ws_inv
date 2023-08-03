@@ -137,15 +137,9 @@ function Orientation:axis_and_sign_to_cardinal(axis, sign)
     assert(not utils.isempty(axis))
     assert(not utils.isempty(sign))
     axis = string.lower(axis)
-    
-    -- Don't want to error if axis is "y". Just say it worked.
-    if axis == "y" then
-        return true
-    end
 
     assert(axis == "x" or axis == "z")
     assert(sign == "-" or sign == "+")
-
     
     return axis_to_cardinal[sign .. axis]
 end
