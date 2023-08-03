@@ -276,8 +276,15 @@ function Turtle:move_to(dest, axis)
             return false
         end
 
+        local res
         while d_c ~= 0 do
-            if not _move_fn() then
+            if axis == "x" or axis == "z" then
+                res = self:forward()
+            else
+                res = (sign == "+") and self:up() or self:down()
+            end
+
+            if not res then
                 print("TurtleError: Movement blocked.")
                 return false
             end
