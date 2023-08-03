@@ -2,8 +2,7 @@ name: CC Program Build
 
 on:
   push:
-    paths:
-      - 'projects/scanner/src/*.lua'
+    branches: [ main ]
 
 jobs:
   build:
