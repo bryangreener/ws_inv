@@ -42,11 +42,11 @@ print("Pulling changes...")
 
 -- Need to delete these two files if they exist since we always want the newest
 -- versions from remote.
-if fs.exists("projects/files.txt") do
+if fs.exists("projects/files.txt") then
     fs.delete("projects/files.txt")
 end
 
-if fs.exists("projects/timestamp.txt") do
+if fs.exists("projects/timestamp.txt") then
     fs.delete("projects/timestamp.txt")
 end
 
