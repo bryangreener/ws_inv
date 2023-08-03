@@ -127,9 +127,4 @@ function Scanner:scan(end_pos, start_pos, mode)
     end
 end
 
-local scanner = Scanner()
-
-local tmp = vector.new(-436, 60, 1737)
-scanner:scan("snake", tmp)
-
 return Scanner
