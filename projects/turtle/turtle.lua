@@ -265,13 +265,6 @@ function Turtle:move_to(dest, axis)
         end
 
         local sign = (d_c < 0) and "-" or "+"
-        local _move_fn
-        if axis == "x" or axis == "z" then
-            move_fn = self:forward
-        else
-            move_fn = (sign == "-") and self:down or self:up
-        end
-
         if not self:turn_to(self.orientation:axis_and_sign_to_cardinal(axis, sign)) then
             return false
         end
