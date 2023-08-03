@@ -1,3 +1,3 @@
-local url = "https://bryangreener.github.io/ws_inv/update_files.lua"
+local url = "https://bryangreener.github.io/ws_inv/projects/update_files.lua"
 shell.run("wget", url, "update_files.lua")
 shell.run("update_files.lua")
