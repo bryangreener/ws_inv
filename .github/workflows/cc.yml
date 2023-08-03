@@ -4,24 +4,17 @@ on:
   push:
     paths:
       - 'projects/scanner/src/*.lua'
-  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    - name: Generate project list
-      shell: bash
-      run: find ./projects -type f -name "*.lua" > ./projects/projects.txt
-    - name: Commit and push changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add projects/projects.txt
-        git commit -m "Update projects.txt" || exit 0  # Exit successfully if nothing to commit
-        git push
+      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: projects/
+          force_orphan: true
