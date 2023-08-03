@@ -40,10 +40,10 @@ end
 
 -- Now pull the changes.
 print("Pulling changes...")
-wget(url .. "projects.txt", "projects/projects.txt")
+wget(url .. "files.txt", "projects/files.txt")
 wget(url .. "timestamp.txt", "projects/timestamp.txt")
 
-for line in io.lines("projects/projects.txt") do
+for line in io.lines("projects/files.txt") do
     if fs.exists(line) and not fs.isDir(line) then
         fs.delete(line)
     end

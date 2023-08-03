@@ -15,11 +15,9 @@ jobs:
       - name: Generate project list
         shell: bash
         run: |
-          cd projects
-          find . -type f -name "*.lua" > ./projects.txt
-          git log -1 --format="%at" | xargs -I{} date -d @{} +%Y/%m/%d_%H:%M:%S >> ./timestamp.txt
-          git rev-parse --short HEAD > ./git_hash.txt
-          cd ..
+          find ./projects -type f -name "*.lua" > ./projects/files.txt
+          git log -1 --format="%at" | xargs -I{} date -d @{} +%Y/%m/%d_%H:%M:%S >> ./projects/timestamp.txt
+          git rev-parse --short HEAD > ./projects/git_hash.txt
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
