@@ -72,8 +72,7 @@ function Scanner.__init__(base, args)
     end
 
     local _turtle = Turtle(on_move_cb, home_pos)
-    print(tostring(_turtle))
-    print(_turtle.calibrate())
+    _turtle:calibrate()
 
     self = {
         turtle=_turtle,
