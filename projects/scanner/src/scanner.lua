@@ -12,7 +12,10 @@ local home_pos = nil
 
 local dest_pos = nil
 
-local Scanner = {}
+local Scanner = {
+    turtle=nil,
+    mode=nil,
+}
 
 local function default_on_move_cb(pos, orientation)
     --print("on_move_cb: " .. textutils.serialize(pos))
@@ -45,25 +48,45 @@ local function scan_snake(_turtle, start_pos, end_pos)
     return res
 end
 
+-- Class that handles scanning an area with a turtle.
+--
+-- Members:
+--      home_pos: See this class's "Args" section.
+--      on_move_cb: See this class's "Args" section.
+--      turtle [Turtle]: A Turtle instance controlled by this class.
+--
+-- Args:
+--      mode [str]: The scanning mode to use.
+--          Available options are: snake
+--      home_pos [vector]: Optional vector defining the home position of the turtle.
+--          If not specified, will use the current turtle position.
+--      on_move_cb [function(vector, Orientation)]: Optional callback function reference.
+--          Called whenever the turtle moves to a new block.
+function Scanner.__init__(o, args)
+    o = o or {}
+    setmetatable(o, self)
+    self.__index = self
+    self.__tostring = Scanner.__tostring
 
-function Scanner.__init__(base, args)
     local home_pos
     local on_move_cb
     local mode
 
     print("Scanner: Initializing...")
 
+    -- args is optional so if not passed we just set it to an empty table.
+    -- This prevents the following checks from erroring.
     if args == nil then
         args = {}
     end
 
-    -- If all three of x, y, and z are specified for home position, use them.
-    -- Otherwise, we will just use the current position as the home position.
-    if args.home_x ~= nil and args.home_y ~= nil and args.home_z ~= nil then
-        home_pos = vector.new(args.home_x, args.home_y, args.home_z)
+    if args.home_pos ~= nil then
+        home_pos = args.home_pos
     end
 
-    if args.on_move_cb == nil then
+    if args.on_move_cb ~= nil then
+        on_move_cb = args.on_move_cb
+    else
         on_move_cb = default_on_move_cb
     end
 
@@ -71,30 +94,18 @@ function Scanner.__init__(base, args)
         mode = SCANNER_DEFAULT_MODE
     end
 
-    local _turtle = Turtle(on_move_cb, home_pos)
-    _turtle:calibrate()
-
-    self = {
-        turtle=_turtle,
-        mode=mode,
-    }
-    setmetatable(
-        self,
-        {
-            __index=Scanner,
-            __tostring=Scanner.__tostring,
-        }
-    )
+    self.turtle = Turtle{home_pos=home_pos, on_move_cb=on_move_cb}
+    self.turtle:calibrate()
 
     print("Scanner: Initialized.")
-    return self
+    return o
 end
 setmetatable(Scanner, {__call=Scanner.__init__})
 
-function Scanner.__tostring()
+function Scanner.__tostring(o)
     return (
         "<Scanner:\n\tturtle=%s\n\tmode=%s>"
-    ):format(tostring(self.turtle), mode)
+    ):format(tostring(o.turtle), mode)
 end
 
 function Scanner:scan(mode, end_pos, start_pos)

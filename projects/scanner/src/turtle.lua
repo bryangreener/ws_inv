@@ -1,7 +1,12 @@
 local utils = require("utils")
 local orientation = require("orientation")
 
-local Turtle = {}
+local Turtle = {
+    home_pos=nil,
+    curr_pos=nil,
+    orientation=nil,
+    on_move_cb=nil,
+}
 
 -- Uses the GPS API to get the current position of the turtle.
 --
@@ -53,7 +58,8 @@ end
 -- Members:
 --      home_pos: See this class's "Args" section.
 --      curr_pos [vector]: The current position of the turtle. Nil until calibrated.
---      _orientation [Orientation]: Current orientation of the turtle. Nil until calibrated.
+--      orientation [Orientation]: Current orientation of the turtle.
+--          Nil until calibrate() is run.
 --      on_move_cb: See this class's "Args" section.
 --
 -- Args:
@@ -61,32 +67,38 @@ end
 --          Called whenever the turtle moves to a new block.
 --      home_pos [vector]: Optional vector specifying the home position of the Turtle.
 --          If not specified, the current position of the turtle is used.
-function Turtle.__init__(base, on_move_cb, home_pos)
-    self = {
-        home_pos=home_pos,
-        curr_pos=nil,
-        orientation=nil,
-        on_move_cb=on_move_cb
-    }
-    setmetatable(
-        self,
-        {
-            __index=Turtle,
-            __tostring=Turtle.__tostring,
-        }
-    )
-    return self
+function Turtle.__init__(o, args)
+    o = o or {}
+    setmetatable(o, self)
+    self.__index = self
+    self.__tostring = Turtle.__tostring
+
+    -- args is optional so if not passed we just set it to an empty table.
+    -- This prevents the following checks from erroring.
+    if args == nil then
+        args = {}
+    end
+
+    if args.home_pos ~= nil then
+        self.home_pos = args.home_pos
+    end
+
+    if args.on_move_cb ~= nil then
+        self.on_move_cb = args.on_move_cb
+    end
+
+    return o
 end
 setmetatable(Turtle, {__call=Turtle.__init__})
 
 -- Overrides the tostring() method with a custom string.
-function Turtle.__tostring()
+function Turtle.__tostring(o)
     return (
         "<Turtle: home_pos=%s, curr_pos=%s, orientation=%s>"
     ):format(
-        tostring(self.home_pos),
-        tostring(self.curr_pos),
-        tostring(self.orientation)
+        tostring(o.home_pos),
+        tostring(o.curr_pos),
+        tostring(o.orientation)
     )
 end
 
@@ -281,7 +293,7 @@ end
 -- move in any direction, it returns back to the starting position and uses the deltas
 -- to calculate orientation. This function uses the GPS to determine current position.
 function Turtle:calibrate()
-    self.curr_pos = vector.new(gps.locate())
+    self.curr_pos = "blah"--vector.new(gps.locate())
     self.orientation = nil
 
     for i=1,4 do

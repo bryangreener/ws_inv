@@ -1,8 +1,9 @@
 local utils = require("utils")
 
-local orientation = {}
+local Orientation = {cardinal=nil}
 
-local Orientation = {}
+-- This is what we return from this module for use with "require()".
+local orientation = {Orientation=Orientation}
 
 -- We will convert all orientations to cardinal throughout this program.
 local cardinal_directions = {
@@ -42,7 +43,12 @@ local int_to_cardinal = utils.invert_table(cardinal_to_int)
 ---     local o0 = Orientation{cardinal="n"}
 ---     local o1 = Orientation{axis="-x"}
 ---     local o2 = Orientation{axis=1}
-function Orientation.__init__(base, args)
+function Orientation.__init__(o, args)
+    o = o or {}
+    setmetatable(o, self)
+    self.__index = self
+    self.__tostring = Orientation.__tostring
+
     local cardinal
 
     assert(args ~= nil)
@@ -64,20 +70,14 @@ function Orientation.__init__(base, args)
 
     assert(not utils.isempty(cardinal))
 
-    self = {cardinal=cardinal}
-    setmetatable(
-        self,
-        {
-            __index=Orientation,
-            __tostring=Orientation.__tostring,
-        }
-    )
-    return self
+    self.cardinal = cardinal
+
+    return o
 end
 setmetatable(Orientation, {__call=Orientation.__init__})
 
-function Orientation.__tostring()
-    return ("<Orientation: cardinal=%s>"):format(self.cardinal)
+function Orientation.__tostring(o)
+    return ("<Orientation: cardinal=%s>"):format(o.cardinal)
 end
 
 -- We only want to use cardinal directions so this is the only variable we expose.
