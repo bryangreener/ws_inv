@@ -10,16 +10,16 @@ local utils = require("utils.utils")
 local Turtle = require("turtle.turtle")
 
 local function pre_move_cb(_turtle, pos, orientation)
-    if _turtle:detect() then
-        _turtle:dig("right")
+    if _turtle.detect() then
+        _turtle.dig("right")
     end
 
-    if _turtle:detect_up() then
-        _turtle:dig_up("right")
+    if _turtle.detect_up() then
+        _turtle.dig_up("right")
     end
 
-    if _turtle:detect_down() then
-        _turtle:dig_down("right")
+    if _turtle.detect_down() then
+        _turtle.dig_down("right")
     end
 end
 
