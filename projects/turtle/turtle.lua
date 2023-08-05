@@ -64,7 +64,7 @@ end
 --      on_move_cb: See this class's "Args" section.
 --
 -- Args:
---      on_move_cb [function(vector, Orientation)]: Optional callback function reference.
+--      on_move_cb [function(Turtle, vector, Orientation)]: Optional callback function reference.
 --          Called whenever the turtle moves to a new block.
 --      home_pos [vector]: Optional vector specifying the home position of the Turtle.
 --          If not specified, the current position of the turtle is used.
@@ -108,7 +108,7 @@ end
 -- Calls the on_move_cb callback if it is not nil.
 function Turtle:on_move()
     if self.on_move_cb ~= nil then
-        self.on_move_cb(self.curr_pos, self.orientation)
+        self.on_move_cb(self, self.curr_pos, self.orientation)
     end
 end
 
