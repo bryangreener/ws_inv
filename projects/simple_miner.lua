@@ -23,7 +23,21 @@ local function pre_move_cb(_turtle, pos, orientation)
     end
 end
 
-local t = Turtle{pre_move_cb=pre_move_cb, gps=false}
+local function on_move_cb(_turtle, pos, orientation)
+    if _turtle.detect() then
+        _turtle.dig("right")
+    end
+
+    if _turtle.detect_up() then
+        _turtle.dig_up("right")
+    end
+
+    if _turtle.detect_down() then
+        _turtle.dig_down("right")
+    end
+end
+
+local t = Turtle{pre_move_cb=pre_move_cb, on_move_cb=on_move_cb, gps=false}
 t:calibrate()
 
 local function mine(_turtle, dest)
