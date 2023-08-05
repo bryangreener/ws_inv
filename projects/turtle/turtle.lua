@@ -263,7 +263,9 @@ end
 -- Turns a turtle to the specified cardinal direction.
 function Turtle:turn_to(dest)
     local delta = self.orientation:get_rotation_delta(nil, dest)
-    if delta < 0 then
+    if delta == 0 then
+        return true
+    elseif delta < 0 then
         return self:turn_left(math.abs(delta))
     else
         return self:turn_right(math.abs(delta))
