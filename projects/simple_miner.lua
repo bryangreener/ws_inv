@@ -26,7 +26,16 @@ end
 local t = Turtle{pre_move_cb=pre_move_cb, gps=false}
 t:calibrate()
 
-local new_pos = vector.new(0, 0, 0)
+local function mine(_turtle, dest)
+    local n_y = math.floor(dest.y / 3)
+    local sign = dest.z / math.abs(dest.z)
 
-t:move_to(new_pos)
+    for y=1,n_y do
+        _turtle:move_to(vector.new(dest.x, y, _turtle:get_pos().z))
+        _turtle:move_to(vector.new(dest.x, y, dest.z * sign))
+        sign = sign * -1
+    end
+end
+
+mine(t, vector.new(0, 0, 0))
 
