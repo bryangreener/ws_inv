@@ -69,11 +69,19 @@ end
 --      home_pos [vector]: Optional vector specifying the home position of the Turtle.
 --          If not specified, the current position of the turtle is used.
 function Turtle.__init__(base, args)
-    local self = {home_pos=nil, curr_pos=nil, orientation=nil, on_move_cb=nil, gps=nil}
+    local self = {
+        home_pos=nil,
+        curr_pos=nil,
+        orientation=nil,
+        pre_move_cb=nil,
+        on_move_cb=nil,
+        gps=nil,
+    }
     setmetatable(self, {__index=Turtle, __tostring=Turtle.__tostring})
 
     if args ~= nil then
         self.home_pos = args.home_pos
+        self.pre_move_cb = args.pre_move_cb
         self.on_move_cb = args.on_move_cb
         self.gps = args.gps
     end
@@ -102,6 +110,15 @@ function Turtle.__tostring(o)
         tostring(o.curr_pos),
         tostring(o.orientation)
     )
+end
+
+-- Handles events where the turtle is about to move to a new coordinate.
+-- The turtle has not actually moved yet, but the turtle HAS rotated to face
+-- the new direction.
+function Turtle:pre_move()
+    if self.pre_move_cb ~= nil then
+        self.pre_move_cb(self, self.curr_pos, self.orientation)
+    end
 end
 
 -- Handles events where the turtle has moved to a new coordinate.
@@ -153,6 +170,8 @@ end
 
 -- Moves turtle forward 1 block.
 function Turtle:forward()
+    self:pre_move()
+
     local res = turtle.forward()
     if not res then
         return res
@@ -166,6 +185,8 @@ end
 
 -- Moves turtle backward 1 block. Does not turn the turtle.
 function Turtle:back()
+    self:pre_move()
+
     -- Change orientation to look behind us but dont actually turn since turning costs
     -- time. This just allows our position updating function to work properly.
     local o = Orientation{cardinal=self.orientation:get()}
@@ -207,6 +228,8 @@ function Turtle:right()
 end
 
 function Turtle:up()
+    self:pre_move()
+
     local res = turtle.up()
     if not res then
         return res
@@ -219,6 +242,8 @@ function Turtle:up()
 end
 
 function Turtle:down()
+    self:pre_move()
+
     local res = turtle.down()
     if not res then
         return res

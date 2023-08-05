@@ -9,20 +9,24 @@ package.path = package.path .. ";../?.lua"
 local utils = require("utils.utils")
 local Turtle = require("turtle.turtle")
 
-local function on_move_cb(_turtle, pos, orientation)
+local function pre_move_cb(_turtle, pos, orientation)
     if _turtle:detect() then
-        _turtle:dig()
+        _turtle:dig("right")
     end
 
     if _turtle:detect_up() then
-        _turtle:dig_up()
+        _turtle:dig_up("right")
     end
 
     if _turtle:detect_down() then
-        _turtle:dig_down()
+        _turtle:dig_down("right")
     end
 end
 
-local t = Turtle(on_move_cb=on_move_cb, gps=false)
+local t = Turtle{pre_move_cb=pre_move_cb, gps=false}
 t:calibrate()
+
+local new_pos = vector.new(0, 0, 0)
+
+t:move_to(new_pos)
 
