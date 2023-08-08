@@ -1,0 +1,12 @@
+./projects/simple_miner.lua
+./projects/update_files.lua
+./projects/scanner.lua
+./projects/phantom.lua
+./projects/turtle/turtle.lua
+./projects/turtle/orientation.lua
+./projects/wifi/message.lua
+./projects/wifi/slave.lua
+./projects/wifi/master.lua
+./projects/utils/config.lua
+./projects/utils/utils.lua
+./projects/utils/inventory.lua
